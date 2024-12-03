@@ -8,13 +8,20 @@ class MyGame extends FlameGame with TapCallbacks {
   static const width = 30.0;
   static const height = 30.0;
   late Map<String, dynamic> geoJson;
+  late List<Zone> zones = [];
 
   @override
   Future<void> onLoad() async {
     String path = 'assets/geojson/map.geojson';
     geoJson = await loadGeoJson(path);
 
-    List<Zone> zones = generateCountriesWith("region", "Western Europe");
+    //List<Zone> zones = generateCountriesWith("region", "Western Europe");
+    //for (Zone zone in zones) {
+    //  world.add(zone);
+    //}
+
+    buildZones();
+    print('ok');
     for (Zone zone in zones) {
       world.add(zone);
     }
@@ -23,61 +30,64 @@ class MyGame extends FlameGame with TapCallbacks {
   }
 
   void cameraSetup() {
-    camera.viewfinder.visibleGameSize = Vector2(width.toDouble(), height.toDouble());
+    camera.viewfinder.visibleGameSize = Vector2(width.toDouble() / 2, height.toDouble() /2);
     camera.viewfinder.position = Vector2(5, -75);
     camera.viewfinder.anchor = Anchor.topCenter;
   }
 
-  // Create Zone for each country with a specific property value.
-  List<Zone> generateCountriesWith(String propertyName, String propertyValue) {
-    List<Zone> zones = [];
-    List? geometries = findCountriesWith(propertyName, propertyValue);
-
-    for (Map<String, dynamic> geometry in geometries!) {
-      List? coordinates = geometry['coordinates'];
-      assert(coordinates != null);
-
-      // Some territory are composed of multiple polygons like France who has Corsica
-      // Some are a simple polygon like Deutchland
-      // multiple polygons add one level of complexity in the coordinates array
-      if (geometry['type'] == 'MultiPolygon') {
-        for (var territories in coordinates!) {
-          for (var lands in territories) {
-            List<Vector2> landCoord = [];
-
-            for (var land in lands) {
-              landCoord.add(Vector2(land[0].toDouble(), -land[1].toDouble()));
-            }
-            zones.add(Zone(landCoord, 1.0));
-          }
-        }
-      } else if (geometry['type'] == 'Polygon') {
-        for (var lands in coordinates!) {
-          List<Vector2> landCoord = [];
-
-          for (var land in lands) {
-            landCoord.add(Vector2(land[0].toDouble(), -land[1].toDouble()));
-          }
-          zones.add(Zone(landCoord, 1.0));
-        }
-      }
-    }
-
-    return zones;
-  }
-
-  // Parse a geojson to extract all geo data with a specific property value
-  // return geometries which are map containing type of the shape (polyygon, multiplePolygon) and coordinates
-  List? findCountriesWith(String propertyName, String propertyValue) {
-    var geometries = [];
-
+  void buildZones() {
     for (var feature in geoJson['features']) {
-      if (feature['properties'][propertyName] == propertyValue &&
-          feature['geometry'] != null) {
-        geometries.add(feature['geometry']);
+      if (feature['geometry'] != null) {
+        List<Vector2> landCoord = [];
+        List? coordinates = feature['geometry']['coordinates'];
+        String name = feature['properties']['name'];
+
+        if (feature['geometry']['type'] == 'MultiPolygon') {
+          // Create a zone for each territory
+          for (var territories in coordinates!) {
+
+            for (var frontierPoints in territories) {
+              for (var points in frontierPoints) {
+                landCoord.add(Vector2(points[0].toDouble(), -points[1].toDouble()));
+              }
+            }
+            Zone newZone = Zone(
+              points: landCoord,
+              scale: 1.0,
+              name: name,
+              iso3: feature['properties']['iso3'],
+              continent: feature['properties']['continent'],
+              region: feature['properties']['region'],
+              status: feature['properties']['status'],
+            );
+            zones.add(newZone);
+            landCoord = [];
+          }
+        }
+        else if (feature['geometry']['type'] == 'Polygon') {
+          // Create zone for the only territorry 
+          for (var frontierPoints in coordinates!) {
+            for (var points in frontierPoints) {
+              landCoord.add(Vector2(points[0].toDouble(), -points[1].toDouble()));
+            }
+          }
+
+          Zone newZone = Zone(
+            points: landCoord,
+            scale: 1.0,
+            name: name,
+            iso3: feature['properties']['iso3'],
+            continent: feature['properties']['continent'],
+            region: feature['properties']['region'],
+            status: feature['properties']['status'],
+          );
+          zones.add(newZone);
+        }
+
+       
+
+        print('ok');
       }
     }
-
-    return geometries;
   }
 }

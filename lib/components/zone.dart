@@ -7,17 +7,24 @@ class Zone extends PolygonComponent with TapCallbacks  {
   static const Color selectedColor = Color.fromARGB(255, 34, 197, 34);
   static const Color defaultColor = Color.fromARGB(255, 55, 78, 192);
 
-  Zone(List<Vector2> points, double scale)
-      : super(
-          points.map((point) => point * scale).toList(),
-          paint: Paint()
-                  ..color = defaultColor
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 0.1,
-        ){
-          priority = 1;
+  Zone({
+    required List<Vector2> points,
+    required double scale,
+    required String iso3,
+    required String name,
+    required String continent,
+    required String region,
+    required String status
+  }) : super(
+        points.map((point) => point * scale).toList(),
+        paint: Paint()
+                ..color = defaultColor
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 0.1,
+      ){
+        priority = 1;
 
-        }
+      }
 
   @override
   bool get debugMode => false;
