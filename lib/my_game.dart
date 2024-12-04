@@ -2,9 +2,10 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:map/load_geojson.dart';
+import 'components/country.dart';
 import 'components/zone.dart';
 
-class MyGame extends FlameGame with TapCallbacks {
+class MyGame extends FlameGame with DragCallbacks, TapCallbacks {
   static const width = 30.0;
   static const height = 30.0;
   late Map<String, dynamic> geoJson;
@@ -15,13 +16,8 @@ class MyGame extends FlameGame with TapCallbacks {
     String path = 'assets/geojson/map.geojson';
     geoJson = await loadGeoJson(path);
 
-    //List<Zone> zones = generateCountriesWith("region", "Western Europe");
-    //for (Zone zone in zones) {
-    //  world.add(zone);
-    //}
-
     buildZones();
-    print('ok');
+
     for (Zone zone in zones) {
       world.add(zone);
     }
@@ -30,8 +26,8 @@ class MyGame extends FlameGame with TapCallbacks {
   }
 
   void cameraSetup() {
-    camera.viewfinder.visibleGameSize = Vector2(width.toDouble() / 2, height.toDouble() /2);
-    camera.viewfinder.position = Vector2(5, -75);
+    camera.viewfinder.visibleGameSize = Vector2(width.toDouble(), height.toDouble());
+    camera.viewfinder.position = Vector2(5, -60);
     camera.viewfinder.anchor = Anchor.topCenter;
   }
 
@@ -45,7 +41,6 @@ class MyGame extends FlameGame with TapCallbacks {
         if (feature['geometry']['type'] == 'MultiPolygon') {
           // Create a zone for each territory
           for (var territories in coordinates!) {
-
             for (var frontierPoints in territories) {
               for (var points in frontierPoints) {
                 landCoord.add(Vector2(points[0].toDouble(), -points[1].toDouble()));
@@ -61,6 +56,8 @@ class MyGame extends FlameGame with TapCallbacks {
               status: feature['properties']['status'],
             );
             zones.add(newZone);
+            Country country = Country.byName(name);
+            country.addZone(newZone);
             landCoord = [];
           }
         }
@@ -71,7 +68,6 @@ class MyGame extends FlameGame with TapCallbacks {
               landCoord.add(Vector2(points[0].toDouble(), -points[1].toDouble()));
             }
           }
-
           Zone newZone = Zone(
             points: landCoord,
             scale: 1.0,
@@ -82,11 +78,9 @@ class MyGame extends FlameGame with TapCallbacks {
             status: feature['properties']['status'],
           );
           zones.add(newZone);
+          Country country = Country.byName(name);
+          country.addZone(newZone);
         }
-
-       
-
-        print('ok');
       }
     }
   }

@@ -3,18 +3,37 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 
+import 'country.dart';
+
 class Zone extends PolygonComponent with TapCallbacks  {
-  static const Color selectedColor = Color.fromARGB(255, 34, 197, 34);
-  static const Color defaultColor = Color.fromARGB(255, 55, 78, 192);
+  static const Color selectedColor = Color.fromARGB(255, 34, 116, 197);
+  static const Color defaultColor = Color.fromARGB(255, 192, 107, 55);
+  static final Map palette = {
+      'selected': {
+        'color': selectedColor,
+        'style': PaintingStyle.fill,
+      } ,
+      'default': {
+        'color': defaultColor,
+        'style': PaintingStyle.stroke,
+      },
+    };
+    
+  final String iso3;
+  final String name;
+  final String continent;
+  final String region;
+  final String status;
+  late Country country;
 
   Zone({
     required List<Vector2> points,
     required double scale,
-    required String iso3,
-    required String name,
-    required String continent,
-    required String region,
-    required String status
+    required this.iso3,
+    required this.name,
+    required this.continent,
+    required this.region,
+    required this.status
   }) : super(
         points.map((point) => point * scale).toList(),
         paint: Paint()
@@ -23,7 +42,7 @@ class Zone extends PolygonComponent with TapCallbacks  {
                 ..strokeWidth = 0.1,
       ){
         priority = 1;
-
+        country = Country.byName(name);
       }
 
   @override
@@ -31,16 +50,12 @@ class Zone extends PolygonComponent with TapCallbacks  {
 
   @override
   void onTapUp(TapUpEvent event) {
-    // Do something in response to a tap event
-    if (paint.color == selectedColor) {
-      paint.style = PaintingStyle.stroke;
-      paint.color = defaultColor;
-    } else {
-      paint.style = PaintingStyle.fill;
-      paint.color = selectedColor;
-    }
-
-    final gameCoordinates = event.localPosition;
-    print("Tap detected at game coordinates: $gameCoordinates");
+    country.setSelected(true);
   }
+
+  void setStyle(String name){
+    paint.color = palette[name]!['color'] as Color;
+    paint.style = palette[name]!['style'] as PaintingStyle;
+  }
+
 }
