@@ -21,10 +21,9 @@ class Country extends Component {
     selectedCountry = country;
   }
 
-
   final String name;
   final List<Zone> zones = [];
-  bool selected = false;
+  bool selected = true;
 
   void addZone(Zone zone) {
     zones.add(zone);
@@ -46,5 +45,9 @@ class Country extends Component {
     }
 
     selected = value;
+  }
+
+  void toggleSelected() {
+    setSelected(!selected);
   }
 }

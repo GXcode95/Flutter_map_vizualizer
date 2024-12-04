@@ -6,13 +6,13 @@ import 'package:flame/events.dart';
 import 'country.dart';
 
 class Zone extends PolygonComponent with TapCallbacks  {
-  static const Color selectedColor = Color.fromARGB(255, 34, 116, 197);
-  static const Color defaultColor = Color.fromARGB(255, 192, 107, 55);
+  static const Color selectedColor = Color.fromARGB(255, 16, 123, 36);
+  static const Color defaultColor = Color.fromARGB(255, 171, 32, 32);
   static final Map palette = {
       'selected': {
         'color': selectedColor,
         'style': PaintingStyle.fill,
-      } ,
+      },
       'default': {
         'color': defaultColor,
         'style': PaintingStyle.stroke,
@@ -55,7 +55,7 @@ class Zone extends PolygonComponent with TapCallbacks  {
 
   void setStyle(String name){
     paint.color = palette[name]!['color'] as Color;
+    paint.color = palette[name]!['color'] as Color;
     paint.style = palette[name]!['style'] as PaintingStyle;
   }
-
 }

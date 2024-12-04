@@ -7,4 +7,3 @@ void main() {
   final game = MyGame();
   runApp(GameWidget(game: game));
 }
-
