@@ -78,13 +78,13 @@ class MyGame extends FlameGame with ScaleDetector, TapCallbacks, ScrollDetector 
 
   static const zoomPerScrollUnit = 1;
 
-  //@override
-  //void onScroll(PointerScrollInfo info) {
-  //  print(info.scrollDelta.global.y.sign); // get scroll direction ( 1 or -1)
-  //  print(info.scrollDelta.global.y.sign * zoomPerScrollUnit); 
-  //  print(camera.viewfinder.zoom);
-  //  camera.viewfinder.zoom += info.scrollDelta.global.y.sign * zoomPerScrollUnit;  // multiply the direction by the zoomPerScrollUnit, can add a factor to increase/decrease the zoom speed
-  //}
+  @override
+  void onScroll(PointerScrollInfo info) {
+    print(info.scrollDelta.global.y.sign); // get scroll direction ( 1 or -1)
+    print(info.scrollDelta.global.y.sign * zoomPerScrollUnit); 
+    print(camera.viewfinder.zoom);
+    camera.viewfinder.zoom += info.scrollDelta.global.y.sign * zoomPerScrollUnit;  // multiply the direction by the zoomPerScrollUnit, can add a factor to increase/decrease the zoom speed
+  }
   
   void cameraSetup() {
     camera.viewfinder.visibleGameSize = Vector2(width.toDouble(), height.toDouble());
@@ -99,6 +99,9 @@ class MyGame extends FlameGame with ScaleDetector, TapCallbacks, ScrollDetector 
         List? coordinates = feature['geometry']['coordinates'];
         String name = feature['properties']['name'];
 
+        //if (feature['geometry']['type'] == null) {
+        //  print('*************************');
+        //}
         if (feature['geometry']['type'] == 'MultiPolygon') {
           // Create a zone for each territory
           for (var territories in coordinates!) {
@@ -107,6 +110,11 @@ class MyGame extends FlameGame with ScaleDetector, TapCallbacks, ScrollDetector 
                 landCoord.add(Vector2(points[0].toDouble(), -points[1].toDouble()));
               }
             }
+            //if (feature['properties']['iso3'] == null || feature['properties']['continent'] == null ||
+            //  feature['properties']['region'] == null || feature['properties']['status'] == null) {
+            //    print('*************************');
+            //}
+
             Zone newZone = Zone(
               points: landCoord,
               scale: 1.0,
@@ -130,6 +138,11 @@ class MyGame extends FlameGame with ScaleDetector, TapCallbacks, ScrollDetector 
               landCoord.add(Vector2(points[0].toDouble(), -points[1].toDouble()));
             }
           }
+
+          //if (feature['properties']['iso3'] == null || feature['properties']['continent'] == null ||
+          //    feature['properties']['region'] == null || feature['properties']['status'] == null) {
+          //      print('*************************');
+          //}
           Zone newZone = Zone(
             points: landCoord,
             scale: 1.0,

@@ -19,11 +19,11 @@ class Zone extends PolygonComponent with TapCallbacks  {
       },
     };
     
-  final String iso3;
+  final String? iso3;
   final String name;
-  final String continent;
-  final String region;
-  final String status;
+  final String? continent;
+  final String? region;
+  final String? status;
   late Country country;
 
   Zone({
